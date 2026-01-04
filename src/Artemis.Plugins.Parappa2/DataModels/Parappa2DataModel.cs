@@ -1,6 +1,10 @@
 using Artemis.Core.Modules;
 
-public class Parappa2DataModel : DataModel
+namespace Artemis.Plugins.Parappa2
 {
-    public byte RankLevel { get; set; }
+    public class Parappa2DataModel : DataModel
+    {
+        public byte RankLevel { get; set; }
+        public bool IsAttached { get; set; }
+    }
 }
