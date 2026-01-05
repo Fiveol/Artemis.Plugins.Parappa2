@@ -10,8 +10,6 @@ Enable PINE in PCSX2 Advanced Settings
 
 TODO:
 
-Score - CE offset  
-
 Current BPM - CE offset 039E660
 
 Parappa inputs count - CE offset 21C5E164 or 21C4EE18
