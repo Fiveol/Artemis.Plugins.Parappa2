@@ -5,7 +5,7 @@
     "Author": "Fivjejinek",
     "Repository": "https://github.com/Fiveol/Artemis.Plugins.Parappa2/",
     "Icon": "image.jpg",
-    "Version": "1.1.1.0",
+    "Version": "1.2.0.0",
     "Main": "Artemis.Plugins.Parappa2.dll",
     "AutoEnableProperties": true,
     "RequiresAdmin": false,
