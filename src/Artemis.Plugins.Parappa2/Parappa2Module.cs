@@ -1,6 +1,5 @@
 using Artemis.Core;
 using Artemis.Core.Modules;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
