@@ -12,6 +12,7 @@
     
     <ItemGroup>
         <Content Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="image.jpg" CopyToOutputDirectory="PreserveNewest" />
         <PackageReference Include="ArtemisRGB.Plugins.BuildTask" Version="2.0.0">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
