@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="ArtemisRGB.UI.Shared" IncludeAssets="compile;build;buildTransitive" Version="1.2025.1222.4"/>
     </ItemGroup>
-
+    
     <ItemGroup>
         <Content Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
         <PackageReference Include="ArtemisRGB.Plugins.BuildTask" Version="2.0.0">

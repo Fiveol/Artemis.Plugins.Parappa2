@@ -1,73 +1,103 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;              // <-- REQUIRED
-using System.Runtime.InteropServices;
 using Artemis.Core;
 using Artemis.Core.Modules;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Artemis.Plugins.Parappa2
 {
+    [PluginFeature(Name = "Parappa2")]
     public class Parappa2Module : Module<Parappa2DataModel>
     {
         private readonly ILogger _logger;
-        private Process? _pcsx2;
 
-        private const long RankAddress = 0x2018931C;
+        private static readonly string[] Pcsx2ProcessNames =
+        {
+            "pcsx2",
+            "pcsx2-qt",
+            "pcsx2-stable",
+            "pcsx2-nightly",
+            "pcsx2-parappa"
+        };
 
         public Parappa2Module(ILogger logger)
         {
             _logger = logger;
         }
 
-        public override List<IModuleActivationRequirement> ActivationRequirements => new();
+        public override List<IModuleActivationRequirement> ActivationRequirements => null;
 
         public override void Enable()
         {
-            _logger.Information("Parappa2Module enabled");
+            AddTimedUpdate(TimeSpan.FromSeconds(1), _ => PollPcsx2(), "PollPCSX2");
+            _logger.Information("Parappa2Module enabled, polling PCSX2 every 1s");
         }
 
         public override void Disable()
         {
-            _pcsx2 = null;
-            DataModel.IsAttached = false;
+            _logger.Information("Parappa2Module disabled");
+            DataModel.IsConnectedToPine = false;
+            DataModel.IsPTR2Running = false;
+            DataModel.GameId = string.Empty;
+            DataModel.GameTitle = string.Empty;
+            DataModel.Rank = string.Empty;
         }
 
         public override void Update(double deltaTime)
         {
-            try
-            {
-                // Find PCSX2 if not attached
-                if (_pcsx2 == null || _pcsx2.HasExited)
-                {
-                    _pcsx2 = Process.GetProcessesByName("pcsx2").FirstOrDefault();
-                    DataModel.IsAttached = _pcsx2 != null;
-
-                    if (_pcsx2 == null)
-                        return;
-                }
-
-                // Read rank byte
-                byte[] buffer = new byte[1];
-                if (ReadProcessMemory(_pcsx2.Handle, (IntPtr)RankAddress, buffer, 1, out _))
-                {
-                    DataModel.RankLevel = buffer[0];
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "Error updating Parappa2Module");
-            }
+            // No per-frame work, handled by timed update
         }
 
-        // WinAPI memory reader
-        [DllImport("kernel32.dll")]
-        private static extern bool ReadProcessMemory(
-            IntPtr hProcess,
-            IntPtr lpBaseAddress,
-            byte[] lpBuffer,
-            int dwSize,
-            out IntPtr lpNumberOfBytesRead);
+        private void PollPcsx2()
+        {
+            bool pcsx2Running = false;
+            foreach (var name in Pcsx2ProcessNames)
+            {
+                if (Process.GetProcessesByName(name).Length > 0)
+                {
+                    pcsx2Running = true;
+                    break;
+                }
+            }
+
+            DataModel.IsConnectedToPine = pcsx2Running;
+
+            if (pcsx2Running)
+            {
+                try
+                {
+                    using var pineClient = new PineClient(_logger, "127.0.0.1", 28011);
+                    var gameId = pineClient.GetGameId();
+                    var title = pineClient.GetTitle();
+
+                    DataModel.GameId = gameId;
+                    DataModel.GameTitle = title;
+                    DataModel.IsPTR2Running = string.Equals(gameId, "SCUS-97167", StringComparison.OrdinalIgnoreCase);
+
+                    // Read Rank from EE RAM address 0x18931C
+                    byte rankValue = pineClient.Read8(0x18931C);
+                    DataModel.Rank = rankValue.ToString("X2");
+
+                    _logger.Debug("Poll result: GameId={GameId}, Title={Title}, Rank={Rank}, IsPTR2Running={IsPTR2Running}",
+                        gameId, title, DataModel.Rank, DataModel.IsPTR2Running);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Failed to query PINE during poll");
+                    DataModel.GameId = string.Empty;
+                    DataModel.GameTitle = string.Empty;
+                    DataModel.Rank = string.Empty;
+                    DataModel.IsPTR2Running = false;
+                }
+            }
+            else
+            {
+                DataModel.GameId = string.Empty;
+                DataModel.GameTitle = string.Empty;
+                DataModel.Rank = string.Empty;
+                DataModel.IsPTR2Running = false;
+            }
+        }
     }
 }
