@@ -22,7 +22,7 @@ namespace Artemis.Plugins.Parappa2
 
         public override void Enable()
         {
-            AddTimedUpdate(TimeSpan.FromSeconds(1), _ => PollPcsx2(), "PollPCSX2");
+            AddTimedUpdate(TimeSpan.FromMilliseconds(100), _ => PollPcsx2(), "PollPCSX2");
         }
 
         public override void Disable()
