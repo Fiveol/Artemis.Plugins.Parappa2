@@ -10,7 +10,7 @@ Enable PINE in PCSX2 Advanced Settings
 
 TODO:
 
-Score - CE offset 0189330
+Score - CE offset  
 
 Current BPM - CE offset 039E660
 

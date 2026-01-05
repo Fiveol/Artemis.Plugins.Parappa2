@@ -6,5 +6,6 @@ namespace Artemis.Plugins.Parappa2
     {
         public string GameId { get; set; } = string.Empty;
         public string Rank { get; set; } = string.Empty;
+        public byte Score { get; set; } = 0;
     }
 }

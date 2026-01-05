@@ -1,5 +1,6 @@
 using Artemis.Core;
 using Artemis.Core.Modules;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -21,6 +22,7 @@ namespace Artemis.Plugins.Parappa2
 
         public override void Enable()
         {
+            // Poll every 100 milliseconds
             AddTimedUpdate(TimeSpan.FromMilliseconds(100), _ => PollPcsx2(), "PollPCSX2");
         }
 
@@ -28,12 +30,10 @@ namespace Artemis.Plugins.Parappa2
         {
             DataModel.GameId = string.Empty;
             DataModel.Rank = string.Empty;
+            DataModel.Score = 0;
         }
 
-        public override void Update(double deltaTime)
-        {
-            // No per-frame work, handled by timed update
-        }
+        public override void Update(double deltaTime) { }
 
         private void PollPcsx2()
         {
@@ -53,21 +53,21 @@ namespace Artemis.Plugins.Parappa2
                 {
                     using var pineClient = new PineClient("127.0.0.1", 28011);
                     DataModel.GameId = pineClient.GetGameId();
-
-                    // Read Rank from EE RAM address 0x18931C
-                    byte rankValue = pineClient.Read8(0x18931C);
-                    DataModel.Rank = rankValue.ToString("X2");
+                    DataModel.Rank = pineClient.Read8(0x18931C).ToString("X2");
+                    DataModel.Score = pineClient.Read8(0x189338);
                 }
                 catch
                 {
                     DataModel.GameId = string.Empty;
                     DataModel.Rank = string.Empty;
+                    DataModel.Score = 0;
                 }
             }
             else
             {
                 DataModel.GameId = string.Empty;
                 DataModel.Rank = string.Empty;
+                DataModel.Score = 0;
             }
         }
     }
