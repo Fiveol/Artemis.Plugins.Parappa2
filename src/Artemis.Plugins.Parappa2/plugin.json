@@ -2,14 +2,13 @@
     "Guid": "1249927D-6E9F-479A-8608-5A2D8931B7C3",
     "Name": "Plugin Name",
     "Description": "Plugin Description",
-    "Author": "",
-    "Website": "",
-    "Repository": "",
-    "Icon": "QuestionMark",
-    "Version": "1.0.0.0",
+    "Author": "Fivjejinek",
+    "Repository": "https://github.com/Artemis-RGB/Artemis.Plugins/blob/master/src/Collections/Artemis.Plugins.PhilipsHue/plugin.json",
+    "Icon": "image.jpg",
+    "Version": "1.1.0.0",
     "Main": "Artemis.Plugins.Parappa2.dll",
     "AutoEnableProperties": true,
     "RequiresAdmin": false,
     "Platforms": "Windows,Linux,OSX",
-    "Api": "1.0.0"
+    "MinimumVersion": "1.2025.1222.3"
 }
